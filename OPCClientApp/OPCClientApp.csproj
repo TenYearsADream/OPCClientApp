@@ -81,7 +81,6 @@
     <Compile Include="Connection\Types\Struct.cs" />
     <Compile Include="Connection\Types\Timer.cs" />
     <Compile Include="Connection\Types\Word.cs" />
-    <Compile Include="Data\Class1.cs" />
     <Compile Include="Data\DataProvider.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>

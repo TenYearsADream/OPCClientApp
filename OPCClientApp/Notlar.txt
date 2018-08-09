@@ -1,1 +1,11 @@
 ﻿install-package StackExchange.Redis.StrongName
+
+hgetall QTY:{DB1.DBD16}:CounterInfo
+
+keys *
+
+get DB1.DBD12
+
+flushdb
+
+del DB1.DBD12
