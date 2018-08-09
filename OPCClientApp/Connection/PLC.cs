@@ -1,3 +1,6 @@
+using OPCClientApp.Store;
+using OPCClientApp.Util;
+using StackExchange.Redis;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +23,8 @@ namespace OPCClientApp.Connection
         private TcpClient tcpClient;
         private NetworkStream stream;
         System.Timers.Timer timerState = null;
+        private IDatabase database = null;
+        private ShortMessageBlog shortMessage = null;
 
         /// <summary>
         /// IP address of the PLC
@@ -102,6 +107,9 @@ namespace OPCClientApp.Connection
         ///  If you use an external ethernet card, this must be set accordingly.</param>
         public Plc(CpuType cpu, string ip, Int16 rack, Int16 slot)
         {
+            database = RedisStore.RedisCache;
+            shortMessage = new ShortMessageBlog(database);
+
             if (!Enum.IsDefined(typeof(CpuType), cpu))
                 throw new ArgumentException($"The value of argument '{nameof(cpu)}' ({cpu}) is invalid for Enum type '{typeof(CpuType).Name}'.", nameof(cpu));
 
@@ -194,16 +202,36 @@ namespace OPCClientApp.Connection
             try
             {
                 timerState.Enabled = false;
-                int deger = 0;
+                int count = 0;
                 Thread.Sleep(20);
 
                 Trace.WriteLine(this.IP + "\tOkunuyor ..");
                 for (int loop = 0; loop < this.Count; loop++)
                 {
-                    if (int.TryParse(Read(this[loop].Adres).ToString(), out deger))
+                    if (int.TryParse(Read(this[loop].Adres).ToString(), out count))
                     {
-                        this[loop].Deger = deger;
-                        Console.WriteLine(this[loop].ToString());
+                        PinValue pinValue = shortMessage.GetCounter(this.Address(loop));
+                        DateTime time = Utility.UnixTimeToDateTime(pinValue.Time);
+                        DateTime now = DateTime.Now;
+                        Console.WriteLine(pinValue.Time);
+                        if (count == pinValue.Count)
+                        {
+                            var times = (now - time).TotalMinutes;
+                            if (times > 2)
+                            {
+                                Console.WriteLine("Duruþ baþlat " + time.ToString());
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Duruþ varsa kapat " + (count - pinValue.Count).ToString());
+                            Console.WriteLine("Log kaydý atýlacak " + (count - pinValue.Count).ToString());
+                            shortMessage.AddCounter(this.Address(loop), count, (int)Utility.ConvertToUnixTime(now));
+                        }
+
+                        this[loop].Deger = count;
+                        //database.StringSet(this[loop].Adres, deger);
+                        Console.WriteLine(this.Address(loop));
                     }
                 }
 
@@ -222,5 +250,9 @@ namespace OPCClientApp.Connection
             }
         }
 
+        private string Address(int index)
+        {
+            return string.Concat(this.IP, ".", this[index].Adres);
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OPCClientApp
+namespace OPCClientApp.Store
 {
     public class RedisStore
     {

@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OPCClientApp
+namespace OPCClientApp.Store
 {
     internal class ShortMessageBlog
     {
-        private const string RedisKeyPrefix = "SMB:";
+        private const string RedisKeyPrefix = "QTY:";
 
         private IDatabase _redis = null;
         public ShortMessageBlog(IDatabase redis)
@@ -17,21 +17,37 @@ namespace OPCClientApp
             _redis = redis;
         }
 
-        public void AddUser(string username, string email, string phone)
+        public void AddCounter(string address, int count, int time)
         {
-            var keyUserList = RedisKeyPrefix + "UserList";
-            if (_redis.SetContains(keyUserList, username))
-            {
-                throw new InvalidOperationException("User already exists");
-            }
-            _redis.SetAdd(keyUserList, username);
+            //var keyUserList = RedisKeyPrefix + "CounterList";
+            //if (!_redis.SetContains(keyUserList, address))
+            //{
+            //    //throw new InvalidOperationException("Counter already exists");
+            //    _redis.SetAdd(keyUserList, address);
+            //}
 
-            var keyAnton = RedisKeyPrefix + "{" + username + "}:UserInfo";
+            var keyAnton = RedisKeyPrefix + "{" + address + "}:CounterInfo";
             _redis.HashSet(keyAnton, new HashEntry[]
             {
-                new HashEntry("email", email),
-                new HashEntry("phone", phone)
+                new HashEntry("qty", count),
+                new HashEntry("time", time)
             });
+        }
+
+        public PinValue GetCounter(string address)
+        {
+            PinValue pinValue = new PinValue();
+
+            var keyAnton = RedisKeyPrefix + "{" + address + "}:CounterInfo";
+            var hashEntry = _redis.HashGetAll(keyAnton);
+            if (hashEntry != null && hashEntry.Length > 0)
+            {
+                pinValue.Count = (int)hashEntry[0].Value;
+                pinValue.Time = (int)hashEntry[1].Value;
+            }
+
+            return pinValue;
+
         }
 
         public void AddPost(string username, string post)
@@ -111,6 +127,12 @@ namespace OPCClientApp
 
             throw new NotImplementedException();
         }
+    }
+
+    public struct PinValue
+    {
+        public int Count { get; set; }
+        public int Time { get; set; }
     }
 }
 

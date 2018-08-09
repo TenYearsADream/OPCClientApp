@@ -1,4 +1,5 @@
 ﻿using OPCClientApp.Connection;
+using OPCClientApp.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,15 +25,45 @@ namespace OPCClientApp
         private void button1_Click(object sender, EventArgs e)
         {
             device = new List<Plc>();
-            Plc plc0 = new Plc(CpuType.S71200, "192.168.144.1", 0, 0, "");
-            plc0.Add(new PLCPin("DB1.DBD0", 0, "25300333"));
-            plc0.Add(new PLCPin("DB1.DBD4", 0, "25400420"));
-            plc0.Add(new PLCPin("DB1.DBD8", 0, "25500527"));
-            plc0.Add(new PLCPin("DB1.DBD12", 0, "25600692"));
-            plc0.Add(new PLCPin("DB1.DBD16", 0, "25600691"));
-            plc0.Open();
-            device.Add(plc0);
+
+            using (DataProvider db = new DataProvider(true))
+            {
+                db.SqlString = "SELECT [IP] FROM [ors_2016].[dbo].[PLC] WITH (NOLOCK) WHERE ADRES IS NOT NULL GROUP BY [IP]";
+                using (DataTable dtip = db.GetTable())
+                {
+                    if (dtip != null && dtip.Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dtip.Rows)
+                        {
+                            Plc plc = new Plc(CpuType.S71200, row["IP"].ToString(), 0, 0, "");
+                            db.SqlString = "SELECT [IP], [ISTASYON], [ADRES], [ACIKLAMA] FROM [ors_2016].[dbo].[PLC] WITH (NOLOCK) WHERE [IP] = N'" + row["IP"].ToString() + "'";
+                            using (IDataReader dr = db.Select())
+                            {
+                                if (dr != null)
+                                {
+                                    while (dr.Read())
+                                    {
+                                        string adres = "";
+                                        string istasyon = "";
+                                        if (!dr.IsDBNull(dr.GetOrdinal("ADRES")))
+                                            adres = dr.GetValue(dr.GetOrdinal("ADRES")).ToString();
+                                        if (!dr.IsDBNull(dr.GetOrdinal("ISTASYON")))
+                                            istasyon = dr.GetValue(dr.GetOrdinal("ISTASYON")).ToString();
+                                        plc.Add(new PLCPin(adres, 0, istasyon));
+                                    }
+                                    dr.Close();
+                                }
+                            }
+                            plc.Open();
+                            device.Add(plc);
+                        }
+                    }
+                }
+            }
+
             device.TrimExcess();
+            Console.WriteLine(device.Count);
+
             //timer1.Enabled = true;
             /*
 
