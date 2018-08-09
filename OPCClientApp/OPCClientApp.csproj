@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3223D30E-2363-4E34-98D0-4481B375FD51}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>OPCClientApp</RootNamespace>
+    <AssemblyName>OPCClientApp</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="StackExchange.Redis.StrongName, Version=1.2.6.0, Culture=neutral, PublicKeyToken=c219ff1ca8c2ce46, processorArchitecture=MSIL">
+      <HintPath>..\packages\StackExchange.Redis.StrongName.1.2.6\lib\net45\StackExchange.Redis.StrongName.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Connection\Compat\TcpClientMixins.cs" />
+    <Compile Include="Connection\Conversion.cs" />
+    <Compile Include="Connection\COTP.cs" />
+    <Compile Include="Connection\Enums.cs" />
+    <Compile Include="Connection\PLC.cs" />
+    <Compile Include="Connection\PLCAddress.cs" />
+    <Compile Include="Connection\PlcAsynchronous.cs" />
+    <Compile Include="Connection\PlcException.cs" />
+    <Compile Include="Connection\PLCExceptions.cs" />
+    <Compile Include="Connection\PLCHelpers.cs" />
+    <Compile Include="Connection\PLCPin.cs" />
+    <Compile Include="Connection\PlcSynchronous.cs" />
+    <Compile Include="Connection\Protocol\ConnectionRequest.cs" />
+    <Compile Include="Connection\Protocol\S7WriteMultiple.cs" />
+    <Compile Include="Connection\Protocol\Serialization.cs" />
+    <Compile Include="Connection\TPKT.cs" />
+    <Compile Include="Connection\Types\Bit.cs" />
+    <Compile Include="Connection\Types\Boolean.cs" />
+    <Compile Include="Connection\Types\Byte.cs" />
+    <Compile Include="Connection\Types\ByteArray.cs" />
+    <Compile Include="Connection\Types\Class.cs" />
+    <Compile Include="Connection\Types\Counter.cs" />
+    <Compile Include="Connection\Types\DataItem.cs" />
+    <Compile Include="Connection\Types\DInt.cs" />
+    <Compile Include="Connection\Types\Double.cs" />
+    <Compile Include="Connection\Types\DWord.cs" />
+    <Compile Include="Connection\Types\Int.cs" />
+    <Compile Include="Connection\Types\Single.cs" />
+    <Compile Include="Connection\Types\String.cs" />
+    <Compile Include="Connection\Types\StringEx.cs" />
+    <Compile Include="Connection\Types\Struct.cs" />
+    <Compile Include="Connection\Types\Timer.cs" />
+    <Compile Include="Connection\Types\Word.cs" />
+    <Compile Include="FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RedisStore.cs" />
+    <Compile Include="ShortMessageBlog.cs" />
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Notlar.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
